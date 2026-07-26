@@ -17,3 +17,17 @@ def invocar_agente_rag(prompt_usuario: str, api_key: str, callbacks: list) -> st
     )
 
     system_prompt = f"""Eres un oficial de cumplimiento normativo bancario.
+Instrucción estricta: Responde la pregunta utilizando ÚNICAMENTE el siguiente Contexto Normativo.
+Si la respuesta no se encuentra explícitamente en el texto, debes responder textualmente:
+"No cuento con información suficiente en los manuales autorizados para responder a su consulta."
+
+Contexto Normativo:
+{BASE_CONOCIMIENTO_CNBV}
+
+Consulta del usuario: {prompt_usuario}
+"""
+
+    respuesta = llm.invoke(system_prompt)
+    if isinstance(respuesta.content, list):
+        return respuesta.content[0].get('text', '') if len(respuesta.content) > 0 else str(respuesta.content)
+    return str(respuesta.content)
